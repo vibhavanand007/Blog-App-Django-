@@ -1,6 +1,7 @@
 from django.shortcuts import render, redirect
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
+import cloudinary.uploader
 from .forms import UserRegisterForm, UserUpdateForm, ProfileUpdateForm
 
 def register(request):
@@ -28,10 +29,12 @@ def profile(request):
             user = u_form.save()
             profile = p_form.save(commit=False)
 
-            # Ensure old images are deleted if a new one is uploaded
+            # ✅ Delete old Cloudinary image if a new one is uploaded (except default)
             if 'image' in request.FILES:
-                if profile.image and profile.image.name != 'default.jpg':
-                    profile.image.delete(save=False)
+                old_image_id = profile.image.public_id if profile.image else None
+
+                if old_image_id and old_image_id != "qccfuwidka0xmyyer58i":
+                    cloudinary.uploader.destroy(old_image_id)
 
             profile.save()
             messages.success(request, 'Your profile has been updated!')

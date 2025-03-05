@@ -29,14 +29,14 @@ def profile(request):
             user = u_form.save()
             profile = p_form.save(commit=False)
 
-            # ✅ Get old Cloudinary image's public_id before updating
+            # ✅ Get old Cloudinary image public_id (Only if not default)
             old_image_id = None
             if profile.image and isinstance(profile.image, str) and "res.cloudinary.com" in profile.image:
                 old_image_id = profile.image.split("/")[-1].split(".")[0]  # Extract public_id from URL
 
-            # ✅ Upload new image if provided (Fix Empty File Error)
+            # ✅ Upload new image only if a valid image is provided
             new_image = request.FILES.get('image')
-            if new_image:
+            if new_image and new_image.size > 0:  # Check for non-empty file
                 uploaded_image = cloudinary.uploader.upload(
                     new_image,
                     folder="profile_pics/"

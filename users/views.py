@@ -20,7 +20,7 @@ def register(request):
 
 @login_required
 def profile(request):
-    """Handles user profile update with image deletion logic."""
+    """Handles user profile update with Cloudinary image deletion logic."""
     if request.method == 'POST':
         u_form = UserUpdateForm(request.POST, instance=request.user)
         p_form = ProfileUpdateForm(request.POST, request.FILES, instance=request.user.profile)
@@ -29,15 +29,29 @@ def profile(request):
             user = u_form.save()
             profile = p_form.save(commit=False)
 
-            # ✅ Delete old Cloudinary image if a new one is uploaded (except default)
-            if 'image' in request.FILES:
-                old_image_id = profile.image.public_id if profile.image else None
+            # ✅ Get old Cloudinary image's public_id before updating
+            old_image_id = None
+            if profile.image and isinstance(profile.image, str) and "cloudinary.com" in profile.image:
+                old_image_id = profile.image.split("/")[-1].split(".")[0]  # Extract public_id from URL
 
-                if old_image_id and old_image_id != "qccfuwidka0xmyyer58i":
-                    cloudinary.uploader.destroy(old_image_id)
+            # ✅ Upload new image if provided
+            if 'image' in request.FILES:
+                uploaded_image = cloudinary.uploader.upload(
+                    request.FILES['image'],
+                    folder="profile_pics/"
+                )
+                profile.image = uploaded_image["public_id"]  # ✅ Store public_id
 
             profile.save()
             messages.success(request, 'Your profile has been updated!')
+
+            # ✅ Delete old image from Cloudinary if a new one was uploaded (excluding default)
+            if old_image_id and old_image_id != "qccfuwidka0xmyyer58i":
+                try:
+                    cloudinary.uploader.destroy(old_image_id)
+                except Exception as e:
+                    print(f"Cloudinary deletion error: {e}")
+
             return redirect('profile')
 
     else:

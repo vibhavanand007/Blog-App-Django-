@@ -1,0 +1,59 @@
+{% extends "blog/base.html" %} {% load static %}
+<!-- Load static files -->
+
+{% block content %}
+<div class="row">
+  <!-- Main blog posts section -->
+  <div class="col-md-8">
+    <article class="media content-section p-3 mb-3 bg-white rounded shadow-sm">
+      {% if object.author.profile.image %}
+      <img
+        class="rounded-circle article-img mr-3"
+        src="{{ object.author.profile.image.url }}"
+        onerror="this.onerror=null; this.src='{{ MEDIA_URL }}default.jpg';"
+        alt="Profile Picture"
+        width="50"
+        height="50"
+      />
+      {% else %}
+      <img
+        class="rounded-circle article-img mr-3"
+        src="{% static 'default.jpg' %}"
+        alt="Default Profile Picture"
+        width="50"
+        height="50"
+      />
+      {% endif %}
+
+      <div class="media-body">
+        <div class="article-metadata">
+          <a class="mr-2 font-weight-bold text-primary" href="#">
+            {{ object.author }}
+          </a>
+          <small class="text-muted"
+            >{{ object.date_posted|date:"F d, Y" }}</small
+          >
+
+          {% if object.author == user %}
+          <div>
+            <a
+              class="btn btn-sm btn-secondary"
+              href="{% url 'post-update' object.id %}"
+              >Update</a
+            >
+            <a
+              class="btn btn-sm btn-danger"
+              href="{% url 'post-delete' object.id %}"
+              >Delete</a
+            >
+          </div>
+          {% endif %}
+        </div>
+
+        <h2 class="article-title text-dark">{{ object.title }}</h2>
+        <p class="article-content text-muted">{{ object.content }}</p>
+      </div>
+    </article>
+  </div>
+</div>
+{% endblock content %}

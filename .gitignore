@@ -1,0 +1,16 @@
+# Ignore environment files
+.env
+*.pyc
+__pycache__/
+db.sqlite3
+
+# Ignore virtual environments
+venv/
+myenv/
+*.log
+
+# Ignore IDE files
+.vscode/
+.idea/
+testing.py
+post.json

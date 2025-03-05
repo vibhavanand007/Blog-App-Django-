@@ -19,16 +19,23 @@ def register(request):
 
 @login_required
 def profile(request):
-    """Handles user profile update."""
+    """Handles user profile update with image deletion logic."""
     if request.method == 'POST':
         u_form = UserUpdateForm(request.POST, instance=request.user)
         p_form = ProfileUpdateForm(request.POST, request.FILES, instance=request.user.profile)
 
         if u_form.is_valid() and p_form.is_valid():
-            u_form.save()
-            p_form.save()
+            user = u_form.save()
+            profile = p_form.save(commit=False)
+
+            # Ensure old images are deleted if a new one is uploaded
+            if 'image' in request.FILES:
+                if profile.image and profile.image.name != 'default.jpg':
+                    profile.image.delete(save=False)
+
+            profile.save()
             messages.success(request, 'Your profile has been updated!')
-            return redirect('profile')  # Prevents form resubmission on refresh
+            return redirect('profile')
 
     else:
         u_form = UserUpdateForm(instance=request.user)

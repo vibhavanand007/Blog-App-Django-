@@ -4,11 +4,11 @@
 {% block content %}
 <div class="content-section">
   <div class="media">
-    {% if user.profile.image %}
-      <img class="rounded-circle account-img" src="{{ user.profile.image.url }}" alt="Profile Picture" />
-    {% else %}
-      <img class="rounded-circle account-img" src="{{ MEDIA_URL }}default.jpg" alt="Default Profile Picture" />
-    {% endif %}
+    <img class="rounded-circle account-img" 
+         src="{{ user.profile.image.url }}" 
+         alt="Profile Picture" 
+         onerror="this.onerror=null; this.src='/media/default.jpg';" />
+
     <div class="media-body">
       <h2 class="account-heading">{{ user.username }}</h2>
       <p class="text-secondary">{{ user.email }}</p>

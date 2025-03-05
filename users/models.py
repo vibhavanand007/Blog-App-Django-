@@ -4,10 +4,12 @@ from PIL import Image
 from io import BytesIO
 from django.core.files.base import ContentFile
 import os
+from cloudinary.models import CloudinaryField
+
 
 class Profile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
-    image = models.ImageField(upload_to='profile_pics/', default='default.jpg')
+    image = CloudinaryField('image', default="https://res.cloudinary.com/dprpypywi/image/upload/w_1000,c_fill,ar_1:1,g_auto,r_max,bo_5px_solid_red,b_rgb:262c35/v1741166591/qccfuwidka0xmyyer58i.jpg")
 
     def __str__(self):
         return f'{self.user.username} Profile'

@@ -26,27 +26,36 @@ def profile(request):
         p_form = ProfileUpdateForm(request.POST, request.FILES, instance=request.user.profile)
 
         if u_form.is_valid() and p_form.is_valid():
-            user = u_form.save()
+            u_form.save()
             profile = p_form.save(commit=False)
 
-            # ✅ Get old Cloudinary image public_id (Only if not default)
-            old_image_id = None
-            if profile.image and isinstance(profile.image, str) and "res.cloudinary.com" in profile.image:
-                old_image_id = profile.image.split("/")[-1].split(".")[0]  # Extract public_id from URL
-
-            # ✅ Upload new image only if a valid image is provided
+            # Check if a new image file is provided and if it is non-empty
             new_image = request.FILES.get('image')
-            if new_image and new_image.size > 0:  # Check for non-empty file
-                uploaded_image = cloudinary.uploader.upload(
-                    new_image,
-                    folder="profile_pics/"
-                )
-                profile.image = uploaded_image["public_id"]  # ✅ Store public_id
+            if new_image and hasattr(new_image, 'size') and new_image.size and new_image.size > 0:
+                try:
+                    # Upload the new image to Cloudinary
+                    uploaded_image = cloudinary.uploader.upload(
+                        new_image,
+                        folder="profile_pics/"
+                    )
+                    # Store only the public_id in the profile
+                    profile.image = uploaded_image["public_id"]
+                except Exception as e:
+                    print("Error uploading image:", e)
+                    messages.error(request, "There was a problem uploading your image. Please try again.")
+                    return redirect('profile')
 
             profile.save()
             messages.success(request, 'Your profile has been updated!')
 
-            # ✅ Delete old image from Cloudinary if a new one was uploaded (excluding default)
+            # Attempt to delete the old image (if applicable)
+            # Extract the old image public_id if the current image is a Cloudinary image URL
+            # (Assumes default public_id is "qccfuwidka0xmyyer58i")
+            old_image_id = None
+            if profile.image and isinstance(profile.image, str) and "res.cloudinary.com" in profile.image:
+                old_image_id = profile.image.split("/")[-1].split(".")[0]
+            
+            # Delete the old image if it exists and isn't the default
             if old_image_id and old_image_id != "qccfuwidka0xmyyer58i":
                 try:
                     cloudinary.uploader.destroy(old_image_id)
@@ -54,7 +63,6 @@ def profile(request):
                     print(f"Cloudinary deletion error: {e}")
 
             return redirect('profile')
-
     else:
         u_form = UserUpdateForm(instance=request.user)
         p_form = ProfileUpdateForm(instance=request.user.profile)

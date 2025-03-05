@@ -31,13 +31,14 @@ def profile(request):
 
             # ✅ Get old Cloudinary image's public_id before updating
             old_image_id = None
-            if profile.image and isinstance(profile.image, str) and "cloudinary.com" in profile.image:
+            if profile.image and isinstance(profile.image, str) and "res.cloudinary.com" in profile.image:
                 old_image_id = profile.image.split("/")[-1].split(".")[0]  # Extract public_id from URL
 
-            # ✅ Upload new image if provided
-            if 'image' in request.FILES:
+            # ✅ Upload new image if provided (Fix Empty File Error)
+            new_image = request.FILES.get('image')
+            if new_image:
                 uploaded_image = cloudinary.uploader.upload(
-                    request.FILES['image'],
+                    new_image,
                     folder="profile_pics/"
                 )
                 profile.image = uploaded_image["public_id"]  # ✅ Store public_id

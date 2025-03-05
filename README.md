@@ -92,45 +92,10 @@ Follow the prompts to create your admin account.
 python manage.py runserver
 Your application is now accessible at http://127.0.0.1:8000/.
 
-Usage
+<!-- Usage
 User Registration: Users can register with a username, email, and password.
 Login/Logout: Registered users can log in and log out.
 Blog Management: Create, update, and delete blog posts.
 Profile Management: Update profile information and upload profile pictures (hosted on Cloudinary).
 Password Reset: Request password reset emails.
-Admin Panel: Manage users and posts via /admin/.
-
-File Structure
-
-django-blog-app/
-├── blog/
-│   ├── migrations/
-│   ├── models.py
-│   ├── views.py
-│   ├── forms.py
-│   ├── templates/
-│   └── urls.py
-├── users/
-│   ├── migrations/
-│   ├── models.py
-│   ├── views.py
-│   ├── forms.py
-│   ├── templates/
-│   └── urls.py
-├── django_blog/
-│   ├── settings.py
-│   ├── urls.py
-│   └── wsgi.py
-├── manage.py
-├── requirements.txt
-└── README.md
-
-
-Troubleshooting
-
-"Empty file" error on image upload: Check your Cloudinary configuration and ensure valid, non-empty files are being uploaded.
-Email not sent: Verify your Amazon SES credentials and ensure your account is out of sandbox mode.
-DNS issues: Ensure your domain is properly verified if using custom email domains.
-
-License
-This project is licensed under the MIT License.
+Admin Panel: Manage users and posts via /admin/. -->
